@@ -1,5 +1,5 @@
 services:
-  db-actors: 
+  db-actors:
     image: postgres:16
     container_name: postgres_actors
     restart: always
@@ -10,33 +10,33 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./api-actors/sql/local/init.sql
+      - ./api-actors/sql/local/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   db-movies:
     image: postgres:16
     container_name: postgres_movies
     restart: always
     environment:
+      POSTGRES_DB: movies
       POSTGRES_USER: movies_user
       POSTGRES_PASSWORD: movies_pass
-      POSTGRES_DB: movies
     ports:
       - "5432:5432"
     volumes:
-      - ./api-movies/sql/local/init.sql
+      - ./api-movies/sql/local/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   frontend:
-  web:
     build:
-     context: ./frontend-movies
-     dockerfile: Dockerfile
-  container_name: frontend
-  environment:
-   API_MOVIES_URL: http://host.docker.internal:8081/api
-   API_ACTORS_URL: http://host.docker.internal:8082/api
-  ports:
-   - "8084:8080"
-  volumes:
-   - ./frontend-movies:/var/www/html
-  depends-on:
-   - db
+      context: ./frontend-movies
+      dockerfile: Dockerfile
+    container_name: frontend
+    environment:
+      API_MOVIES_URL: http://host.docker.internal:8081/api
+      API_ACTORS_URL: http://host.docker.internal:8082/api
+    ports:
+      - "8084:8080"
+    volumes:
+      - ./frontend-movies:/var/www/html
+    depends_on:
+      - db-actors
+      - db-movies
